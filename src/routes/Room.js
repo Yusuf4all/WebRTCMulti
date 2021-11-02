@@ -340,12 +340,14 @@ const Room = (props) => {
   };
 
   const isConnedtionAvailable = (peerConnection) => {
-    if (
-      (peerConnection && peerConnection.connectionState === "new") ||
-      peerConnection.connectionState == "connecting" ||
-      peerConnection.connectionState == "connected"
-    ) {
-      return true;
+    if (peerConnection) {
+      if (
+        peerConnection.connectionState === "new" ||
+        peerConnection.connectionState == "connecting" ||
+        peerConnection.connectionState == "connected"
+      ) {
+        return true;
+      }
     } else return false;
   };
 
