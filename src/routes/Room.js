@@ -31,7 +31,13 @@ const Room = (props) => {
 
   const [peers, setPeer] = useState([]);
   const [isNewUser, setNewUser] = useState(false);
-  const [startStopLabel, setStartStopLabel] = useState(false);
+
+  const [btnLabel, setBtnLabel] = useState({
+    isCamera: false,
+    isShare: false,
+    isMute: false,
+  });
+
   const [myConnid, setMyconnectionId] = useState("");
   const [userName, setUserName] = useState("");
   const [meetingName, setMeetingName] = useState("");
@@ -265,7 +271,8 @@ const Room = (props) => {
   };
 
   const handleStartStopCamera = async () => {
-    setStartStopLabel(!startStopLabel);
+    setBtnLabel({ ...btnLabel, isCamera: !btnLabel.isCamera });
+
     if (videoState.current == videoStates.current.Camera) {
       await manageVideo(videoStates.current.None);
     } else {
@@ -287,6 +294,17 @@ const Room = (props) => {
           video: { width: 720, height: 480 },
           audio: false,
         });
+      } else if (newVideoStatus === videoStates.current.ScreenShare) {
+        vStream = await navigator.mediaDevices.getDisplayMedia({
+          audio: true,
+          video: {
+            frameRate: 1,
+          },
+        });
+        vStream.oninactive = (event) => {
+          debugger;
+          clearCurrentVideoStream(rtpVideoSenders.current);
+        };
       }
 
       clearCurrentVideoStream(rtpVideoSenders.current);
@@ -349,6 +367,16 @@ const Room = (props) => {
         return true;
       }
     } else return false;
+  };
+
+  const handleStartStopScreenshar = async () => {
+    setBtnLabel({ ...btnLabel, isShare: !btnLabel.isShare });
+
+    if (videoState === videoStates.current.ScreenShare) {
+      await manageVideo(videoStates.current.None);
+    } else {
+      await manageVideo(videoStates.current.ScreenShare);
+    }
   };
 
   return (
@@ -425,10 +453,15 @@ const Room = (props) => {
           <div className="toolbox">
             <button onClick={handleStartStopCamera} id="btnStartStopCam">
               {" "}
-              {startStopLabel ? "Stop Camera" : "Start Camera"}{" "}
+              {btnLabel.isCamera ? "Stop Camera" : "Start Camera"}{" "}
+            </button>
+            <button
+              onClick={handleStartStopScreenshar}
+              id="btnStartStopScreenshare"
+            >
+              {btnLabel.isShare ? "Stop Screen Share" : "Screen Share"}
             </button>
             <button id="btnMuteUnmute">UnMute</button>
-            <button id="btnStartStopScreenshare">Screen Share</button>
             <button id="btnResetMeeting">Reset Meeting</button>
           </div>
         ) : null}
