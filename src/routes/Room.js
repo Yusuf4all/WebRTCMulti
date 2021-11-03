@@ -298,7 +298,7 @@ const Room = (props) => {
         vStream = await navigator.mediaDevices.getDisplayMedia({
           audio: true,
           video: {
-            frameRate: 1,
+            frameRate: 2,
           },
         });
         vStream.oninactive = (event) => {
